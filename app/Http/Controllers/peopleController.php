@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ExportDataSertifikasi;
+use App\Models\Detailserti;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
-class skemaController extends Controller
+class peopleController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -13,8 +16,15 @@ class skemaController extends Controller
      */
     public function index()
     {
-        $title ='Skema';
-        return view ('skema.index',compact('title'));
+        {
+            $data = Detailserti::orderBy('name', 'asc')->get();
+            return view("Dashboard.index", ['data' => $data]);
+        }
+    
+        function export_exel()
+        {
+            return Excel::download(new ExportDataSertifikasi,"DataSertifikasi.xlsx");
+        }     
     }
 
     /**

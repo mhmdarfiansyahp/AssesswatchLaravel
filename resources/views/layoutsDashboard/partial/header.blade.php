@@ -1,7 +1,8 @@
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<link rel="shortcut icon" href="{{ asset('assets/image/Logo_ASTRAtech.png') }}">
+	<title>Sertfikasi Politeknik Astra</title>
+    <link rel="shortcut icon" href="{{ asset('assets/image/Logo_ASTRAtech.png') }}">
 <link href="{{ asset('assets/Plugins/bootstrap-4.0.0-alpha.6-dist/css/bootstrap.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('assets/Plugins/font-awesome-4.7.0/css/font-awesome.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('assets/Content/jquery.fancybox.css') }}" rel="stylesheet" />
@@ -32,6 +33,7 @@
 <script src="{{ asset('assets/Scripts/aos.js') }}"></script>
 <script src="{{ asset('assets/Scripts/xlsx.full.min.js') }}"></script>
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 <script type="text/javascript">
     $(function () {
         $("[data-toggle=tooltip").tooltip();
@@ -119,3 +121,44 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.html5.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.print.min.js"></script> --}}
+
+    <header>
+        <div class="polman-nav-static-top" style="display: flex; align-items: center; justify-content: space-between; padding: 10px;">
+
+            <div class="float-left logo-container">
+                <a href="#">
+                    <img src="{{ asset('assets/image/palingbaru_logo.png') }}" style="height: 50px;" />
+                </a>
+            </div>
+        
+            <div class="float-right" style="padding-right: 2%;">
+                <div class="col-lg-4 mt-2 mb-2">
+                    <a class="btn btn-primary" href='{{ route('login.index') }}'>Masuk</a>
+                </div>
+            </div>
+        
+        </div>
+        
+    </header>
+
+    <style>
+        .logo-container {
+           padding-left: 10px;
+        }
+    </style>
+
+    <style>
+        .polman-nav-static-top {
+            top: 0;
+            left: 0;
+            right: 0;
+            position: fixed;
+            height: 70px;
+            width: 100% !important;
+            padding: 10px 20px 10px 20px;
+            box-shadow: 0px 2px 0px 0px #EEE;
+            background-color: white;
+            z-index: 4;
+        }
+        </style>
+

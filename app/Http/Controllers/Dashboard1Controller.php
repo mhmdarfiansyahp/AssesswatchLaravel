@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Detailserti;
 use App\Models\Prodi;
 use App\Models\Sertifikasi;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\DB;
-use PDO;
 
-class DashboardController extends Controller
+class Dashboard1Controller extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,23 +17,12 @@ class DashboardController extends Controller
     public function index()
     {
         $title = 'Dashboard';
-        
-        // $detail = Detailserti::join('sertifikasi as s', 's.id_sertifikasi', '=', 'detailserti.id_sertifikasi')
-        // ->join('prodi as f', 'f.id_prodi', '=', 's.id_prodi')
-        // ->select(
-        //     'f.nama_prodi',
-        //     DB::raw('COUNT(DISTINCT s.id_sertifikasi) AS jumlah_sertifikasi'),
-        //     DB::raw('SUM(detailserti.status) AS jumlah_kompeten'),
-        //     DB::raw('COUNT(*) - SUM(detailserti.status) AS jumlah_tidak_kompeten')
-        // )
-        // ->groupBy('f.nama_prodi')
-        // ->get();    
         $prodiList = Prodi::all();
-        $sertifikasiList = Sertifikasi::all();
         $data = Sertifikasi::with('prodi')->get();
 
-        return view('Dashboard.index', compact('title', 'prodiList', 'sertifikasiList'),['sertifikasi' => $data]);
+        return view ('Dashboard1.index', compact('title', 'prodiList'),['sertifikasi' => $data]);
     }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -44,11 +30,7 @@ class DashboardController extends Controller
      */
     public function create()
     {
-        // $title = 'Dashboard';
-        // $sertifikasiData = Sertifikasi::all();
-        // $prodiData = Prodi::all();
-    
-        // return view('Dashboard.create', compact('title', 'sertifikasiData', 'prodiData'));
+        //
     }
 
     /**
@@ -59,19 +41,7 @@ class DashboardController extends Controller
      */
     public function store(Request $request)
     {
-        // $validateData = $request->validate([
-        //     'id_sertifikasi' => 'required',
-        //     'nama_peserta' => 'required|string|max:50',
-        //     'status' => 'required'
-        // ], [
-        //     'id_sertifikasi.required' => 'Nama Sertifikasi wajib diisi.',
-        //     'nama_peserta.required' => 'Nama Peserta Wajib diisi.',
-        //     'status.required' => 'Status Wajib diisi.',
-        // ]);
-        // unset($validateData['id_prodi']);
-
-        // Detailserti::create($validateData);
-        // return redirect()->route('Dashboard.index')->with('success', 'Sertifikasi created successfully');    
+        //
     }
 
     /**
@@ -194,4 +164,5 @@ class DashboardController extends Controller
 
         return $results;
     }
+    
 }

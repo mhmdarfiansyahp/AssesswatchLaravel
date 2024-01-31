@@ -1,146 +1,237 @@
-@extends('layouts.layout')
+@extends('layoutsDashboard.layout')
 @section('konten')
 
-{{-- <div class="row">
-    <div class="col-md-3">
-        <a href="{{ route('Dashboard.create') }}" class="btn btn-success">
-            <i class="fa fa-plus"></i>&nbsp;Tambah
-        </a>
-    </div>
-</div> --}}
 
-@if (session('success'))
-<script>
-    Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: '{{ session('success') }}',
-        showConfirmButton: false,
-        timer: 2000
-    });
-</script>
+@if (session('error'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: '{{ session('error') }}',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    </script>
 @endif
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+
 <style>
+
+    body {
+        padding-top: 60px; /* Atur spasi sesuai kebutuhan */
+    }
+
+    .row {
+        padding-left: 20px; /* Sesuaikan dengan jumlah padding yang diinginkan */
+        padding-right: 20px; /* Sesuaikan dengan jumlah padding yang diinginkan */
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td {
+        border: 3px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+</style>
+
+<style>
+    .card {
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1); /* Menambahkan bayangan pada card */
+        transition: box-shadow 0.3s ease-in-out; /* Efek transisi saat hover */
+
+        /* Menambahkan padding agar card tidak menyentuh tepi layar */
+        padding: 10px; 
+        margin: 10px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+    }
+
     .scrollstyle {
         overflow-y: auto; /* Tambahkan pengguliran vertikal jika kontennya melebihi tinggi maksimal */
     }
-    
 </style>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h3>Grafik Sertifikasi Keseluruhan</h3>
+<div class="container-fluid">
+    {{-- <div class="card-logo">
+        <img class="card-img-top" src="{{ asset('assets/image/gambar_banner.jpg') }}" alt="Banner Image">
+    
+        <div class="row">
+            <div class="col-lg-4" style="text-align: center; padding: 40px 0px;">
+                <img src="{{ asset('assets/image/IMG_LogoTransformationInHarmony.png') }}" class="wow fadeInUp fast" style="width: 60%; visibility: visible; animation-name: fadeInUp; animation-iteration-count: 1;">
             </div>
-            <br>
-            <div class="card-body scrollstyle">
-                <div class="col-md-5 col-sm-12">
-                    <div class="row">
-                        <div class="col">
-                            <select class="form-control" id="filter-year" style="border-radius: 10px;">
-                                <option value="">Pilih Tahun</option>
-                                @for ($i = 0; $i < 5; $i++) 
-                                    <option value="{{ now()->year - $i }}">{{ now()->year - $i }}</option>
-                                @endfor
-                            </select>
-                        </div>
+            <div class="col-lg-4" style="text-align: center; padding: 40px 0px;">
+                <img src="{{ asset('assets/image/IMG_LogoKampusMerdeka.png') }}" class="wow fadeInUp fast" style="width: 30%; visibility: visible; animation-name: fadeInUp; animation-iteration-count: 1;">
+            </div>
+            <div class="col-lg-4" style="text-align: center; padding: 40px 0px;">
+                <img src="{{ asset('assets/image/IMG_LogoSatuIndonesia.png') }}" class="wow fadeInUp fast" style="width: 40%; visibility: visible; animation-name: fadeInUp; animation-iteration-count: 1;">
+            </div>
+        </div>
+    </div> --}}
 
-                        <div class="col">
-                            <select class="form-control" id="filter-prodi" style="border-radius: 10px;">
-                                <option value="">Pilih Prodi</option>
-                                @foreach($prodiList as $prodi)
-                                    @if($prodi->status === 'Aktif')
-                                        <option value="{{ $prodi->id_prodi }}">{{ $prodi->nama_prodi }}</option>
-                                    @endif
-                                @endforeach
-                            </select>
-                        </div>                        
-                    
-                        <div class="col">
-                            <select class="form-control" id="filter-sertifikasi" style="border-radius: 10px;">
-                                <option value="">Pilih Sertifikasi</option>
-                            </select>
-                        </div>
-                        
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header text-center"> 
+                    <h2>Laporan Sertifikasi Mahasiswa Politeknik Astra</h2>
+                </div>                
+                <br>
+                <br>
+                <div class="card-body">
+                    <div class="col-md-5 col-sm-12">
+                    <h4>Grafik Keseluruhan Sertifikasi</h4>
                     </div>
                 </div>
-                <div class="col-12">
-                    <div class="chart-container">
-                        <canvas id="myChart" width="200" height="60"></canvas>
-                    </div>                
-                </div>
-                <br>
-                <br>
-                <div class="col-12">
-                    <table id="skemaTable" class="table table-hover table-bordered table-condensed table-striped grid text-center" width="100%">
-                        <thead>
-                            <tr>
-                                <th class="align-middle text-center">No.</th>
-                                <th class="align-middle text-center">Nama Prodi</th>
-                                <th class="align-middle text-center">Nama Sertifikasi</th>
-                                <th class="align-middle text-center">Tanggal Sertifikasi</th>
-                                <th class="align-middle text-center">Lembaga</th>
-                                <th class="align-middle text-center">Level Sertifikasi</th>
-                                <th class="align-middle text-center">Bukti Pendukung</th>
-                                <th class="align-middle text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>    
-                            @php
-                                $nomor = 1; // Inisialisasi nomor
-                            @endphp
+                <div class="card-body scrollstyle">
+                    <div class="col-md-5 col-sm-12">
+                        <div class="row">
+                            <div class="col">
+                                <select class="form-control" id="filter-year" style="border-radius: 10px;">
+                                    <option value="">Pilih Tahun</option>
+                                    @for ($i = 0; $i < 5; $i++) 
+                                        <option value="{{ now()->year - $i }}">{{ now()->year - $i }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+    
+                            <div class="col">
+                                <select class="form-control" id="filter-prodi" style="border-radius: 10px;">
+                                    <option value="">Pilih Prodi</option>
+                                    @foreach($prodiList as $prodi)
+                                        @if($prodi->status === 'Aktif')
+                                            <option value="{{ $prodi->id_prodi }}">{{ $prodi->nama_prodi }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>                            
+                        
+                            <div class="col">
+                                <select class="form-control" id="filter-sertifikasi" style="border-radius: 10px;">
+                                    <option value="">Pilih Sertifikasi</option>
+                                </select>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="chart-container">
+                            <canvas id="myChart" width="180" height="50"></canvas>
+                        </div>                
+                    </div>
+                    <br>
+                    <br>
+                    <div class="col-12">
+                        <table id="skemaTable" class="table table-hover table-bordered table-condensed table-striped grid text-center" width="100%">
+                            <thead>
+                                <tr>
+                                    <th class="align-middle text-center">No.</th>
+                                    <th class="align-middle text-center">Nama Prodi</th>
+                                    <th class="align-middle text-center">Nama Sertifikasi</th>
+                                    <th class="align-middle text-center">Tanggal Sertifikasi</th>
+                                    <th class="align-middle text-center">Lembaga</th>
+                                    <th class="align-middle text-center">Level Sertifikasi</th>
+                                    <th class="align-middle text-center">Bukti Pendukung</th>
+                                    <th class="align-middle text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $nomor = 1; // Inisialisasi nomor
+                                @endphp
                                 @forelse ($sertifikasi->where('prodi.status', 'Aktif')->sortBy('tanggal_sertifikasi') as $item)
-                                    <tr data-prodi-id="{{ $item->prodi->id_prodi }}" data-sertifikasi-id="{{ $item->id_sertifikasi }}">
-                                            <td>{{$nomor++}}</td>
-                                            <td>{{$item->prodi->nama_prodi}}</td>
-                                            <td>{{$item['nama_sertifikasi']}}</td>
-                                            <td>{{ \Carbon\Carbon::parse($item->tanggal_sertifikasi)->format('d-F-Y') }}</td>
-                                            <td>{{$item['lembaga']}}</td>
-                                            <td>{{$item['level']}}</td>
-                                            <td><a href="{{ route('sertifikasi.download', ['id' => $item->id_sertifikasi]) }}" class="btn btn-primary btn-download" download>
-                                                    <i class="fa fa-download"></i> &nbsp;Download Bukti Pendukung
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="" id="detail-{{ $item->id_detail_sertifikasi }}" class="btn btn-sm detail-button"
-                                                    data-toggle="modal" data-target="#modal-detail"
-                                                    data-kom="{{ $item->kompeten }}"
-                                                    data-tkom="{{ $item->tidakkompeten }}"
-                                                    data-tdkh="{{ $item->tidakhadir }}"
-                                                    data-jmlh="{{ $item->jumlah }}">
-                                                    <i class="fas fa-list" aria-hidden="true"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="13" class="text-center">Tidak ada data sertifikasi yang tersedia.</td>
-                                    </tr>
+                                <tr data-prodi-id="{{ $item->prodi->id_prodi }}" data-sertifikasi-id="{{ $item->id_sertifikasi }}">
+                                    <td class="align-middle text-center">{{$nomor++}}</td>
+                                    <td class="align-middle text-center">{{$item->prodi->nama_prodi}}</td>
+                                    <td class="align-middle text-center">{{$item['nama_sertifikasi']}}</td>
+                                    <td class="align-middle text-center">{{ \Carbon\Carbon::parse($item->tanggal_sertifikasi)->format('d-F-Y') }}</td>
+                                    <td class="align-middle text-center">{{$item['lembaga']}}</td>
+                                    <td class="align-middle text-center">{{$item['level']}}</td>
+                                    <td class="align-middle text-center">
+                                        <a href="{{ route('sertifikasi.download', ['id' => $item->id_sertifikasi]) }}" class="btn btn-primary btn-download" download>
+                                            <i class="fa fa-download"></i> &nbsp;Download Bukti Pendukung
+                                        </a>
+                                    </td> 
+                                    <td class="align-middle text-center">
+                                        <a href="" id="detail-{{ $item->id_detail_sertifikasi }}" class="btn btn-sm detail-button"
+                                            data-toggle="modal" data-target="#modal-detail"
+                                            data-kom="{{ $item->kompeten }}"
+                                            data-tkom="{{ $item->tidakkompeten }}"
+                                            data-tdkh="{{ $item->tidakhadir }}"
+                                            data-jmlh="{{ $item->jumlah }}">
+                                            <i class="fas fa-list" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="13" class="text-center">Tidak ada data sertifikasi yang tersedia.</td>
+                                </tr>
                             @endforelse
-                        </tbody>
-                    </table>
+                            
+                            </tbody>
+                        </table>
+                    </div>                    
+    
+                    <div class="modal fade" id="modal-detail">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <!-- Modal Header -->
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Detail Data Sertifikasi </h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                
+                                <!-- Modal Body -->
+                                <div class="modal-body table-responsive">
+                                    <table class="table table-bordered no-margin">
+                                        <tbody>
+                
+                                            <tr>
+                                                <th>Peserta Kompeten</th>
+                                                <td><span id="modal-detail-kom"></span></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Peserta Tidak Kompeten</th>
+                                                <td><span id="modal-detail-tkom"></span></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Peserta Tidak Hadir</th>
+                                                <td><span id="modal-detail-tdkh"></span></td>
+                                            </tr>                         
+                                            <tr>
+                                                <th>Total Peserta</th>
+                                                <td><span id="modal-detail-jmlh"></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-
+<!-- CSS DataTables -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+
+<!-- JS DataTables -->
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
 
-{{-- <script>
-    $(document).ready(function() {
-        $('#skemaTable').DataTable({
-            searching: false, // Menyembunyikan kotak pencarian
-            ordering: false // Mengurutkan berdasarkan kolom "Tanggal Sertifikasi" secara ascending (terbaru ke terlama)
-        });
-    });
-</script> --}}
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -166,9 +257,6 @@
 </script>
 
 <script>
-$(document).ready(function() {
-    $('[data-toggle="tooltip"]').tooltip();
-});
 
 loadGrafikkeseluruhan()
 $(document).ready(function () {
@@ -280,9 +368,9 @@ $(document).ready(function () {
 });
 
 
-const ctx = document.getElementById('myChart').getContext('2d');
+    const ctx = document.getElementById('myChart').getContext('2d');
 
-const chart = new Chart(ctx, {
+    const chart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: [],
@@ -326,9 +414,7 @@ const chart = new Chart(ctx, {
                     },
                     formatter: function(value) {
                         return value; // Menambahkan tanda persen pada nilai
-                    },
-
-                    offset: -6,
+                    },                    offset: -12,
                     padding: 4,
                     textAlign: 'center',
                 }
@@ -337,6 +423,7 @@ const chart = new Chart(ctx, {
         // Tambahkan plugin Chart.js Label
         plugins: [ChartDataLabels]
     });
+
 
 
 // Your existing event listener for window resize
@@ -364,12 +451,12 @@ function loadGrafikBytahun(selectedYear) {
 
             // Map the data into an array
             var newDataArray = data.map(function (item) {
-            return {
-                label: item.nama_prodi,
-                kompeten: item.total_kompeten,
-                tidakKompeten: item.total_tidakkompeten,
-                tidakHadir: item.total_tidakhadir,
-            };
+                return {
+                    label: item.nama_prodi,
+                    kompeten: item.total_kompeten,
+                    tidakKompeten: item.total_tidakkompeten,
+                    tidakHadir: item.total_tidakhadir,
+                };
             });
 
             // Separate arrays for each dataset
@@ -416,6 +503,8 @@ function loadGrafikBytahun(selectedYear) {
                 borderWidth: 1
             });
 
+
+
             // Update x-axis categories
             chart.data.labels = newDataArray.map(function (item) {
                 return item.label;
@@ -436,12 +525,14 @@ function loadGrafikBytahun(selectedYear) {
 
 function loadGrafikkeseluruhan() {
     $.ajax({
-        url: "/Dashboard/alldata",
-        type: "GET",
-        dataType: 'json',
-        success: function (data) {
-            // Map the data into an array
-            var newDataArray = data.map(function (item) {
+    url: "/Dashboard/alldata",
+    type: "GET",
+    dataType: 'json',
+    // data: { year: selectedYear },
+    success: function (data) {
+
+        // Map the data into an array
+        var newDataArray = data.map(function (item) {
             return {
                 label: item.nama_prodi,
                 kompeten: item.total_kompeten,
@@ -449,64 +540,67 @@ function loadGrafikkeseluruhan() {
                 tidakHadir: item.total_tidakhadir,
             };
         });
-            
-            // Separate arrays for each dataset
-            var kompetenData = newDataArray.map(function (item) {
-                return item.kompeten;
-            });
 
-            var tidakKompetenData = newDataArray.map(function (item) {
-                return item.tidakKompeten;
-            });
+        // Separate arrays for each dataset
+        var kompetenData = newDataArray.map(function (item) {
+            return item.kompeten;
+        });
 
-            var tidakHadirData = newDataArray.map(function (item) {
-                return item.tidakHadir;
-            });
+        var tidakKompetenData = newDataArray.map(function (item) {
+            return item.tidakKompeten;
+        });
 
-            // Clear existing datasets
-            chart.data.datasets = [];
+        var tidakHadirData = newDataArray.map(function (item) {
+            return item.tidakHadir;
+        });
 
-            // Add bar datasets
-            chart.data.datasets.push({
-                label: 'Kompeten (Bar)',
-                type: 'bar',
-                data: kompetenData,
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgb(54, 162, 235)',
-                borderWidth: 1
-            });
+        // Clear existing datasets
+        chart.data.datasets = [];
 
-            chart.data.datasets.push({
-                label: 'TidakKompeten',
-                type: 'bar',
-                data: tidakKompetenData,
-                backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                borderColor: 'rgb(255, 159, 64)',
-                borderWidth: 1
-            });
+        // Add bar datasets
+        chart.data.datasets.push({
+            label: 'Kompeten (Bar)',
+            type: 'bar',
+            data: kompetenData,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)', // Latar belakang biru dengan transparansi
+            borderColor: 'rgb(54, 162, 235)',           // Warna batas biru
+            borderWidth: 1
+        });
 
-            chart.data.datasets.push({
-                label: 'TidakHadir',
-                type: 'bar',
-                data: tidakHadirData,
-                backgroundColor: 'rgba(255, 205, 86, 0.2)',
-                borderColor: 'rgb(255, 205, 86)',
-                borderWidth: 1
-            });
+        chart.data.datasets.push({
+            label: 'TidakKompeten',
+            type: 'bar',
+            data: tidakKompetenData,
+            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+            borderColor: 'rgb(255, 159, 64)',
+            borderWidth: 1
+        });
 
-            // Update x-axis categories
-            chart.data.labels = newDataArray.map(function (item) {
-                return item.label;
-            });
+        chart.data.datasets.push({
+            label: 'TidakHadir',
+            type: 'bar',
+            data: tidakHadirData,
+            backgroundColor: 'rgba(255, 205, 86, 0.2)',
+            borderColor: 'rgb(255, 205, 86)',
+            borderWidth: 1
+        });
 
-            // Update the chart
-            chart.update();
-        },
-        error: function (xhr, status, error) {
-            console.error("AJAX Error:", status, error);
-            swal.fire("Error!", "Terjadi kesalahan saat mengambil data pemakaian!", "error");
-        }
+        // Update x-axis categories
+        chart.data.labels = newDataArray.map(function (item) {
+            return item.label;
+        });
+
+        // Update the chart
+        chart.update();
+    },
+
+    // Handle errors in the AJAX request
+    error: function (xhr, status, error) {
+        console.error("AJAX Error:", status, error);
+        swal.fire("Error!", "Terjadi kesalahan saat mengambil data pemakaian!", "error");
+    }
     });
+
 }
 
 function loadGrafikByProdi(sertifikasi) {
@@ -518,8 +612,8 @@ function loadGrafikByProdi(sertifikasi) {
         success: function (data) {
             console.log(sertifikasi);
 
-             // Map the data into an array
-             var newDataArray = data.map(function (item) {
+            // Map the data into an array
+            var newDataArray = data.map(function (item) {
                 return {
                     label: item.nama_sertifikasi,
                     kompeten: item.total_kompeten,
@@ -571,6 +665,7 @@ function loadGrafikByProdi(sertifikasi) {
                 borderColor: 'rgb(255, 205, 86)',
                 borderWidth: 1
             });
+
 
             // Update x-axis categories
             chart.data.labels = newDataArray.map(function (item) {
@@ -691,6 +786,7 @@ function loadGrafiksertifikasi(id_sertifikasi) {
                 borderWidth: 1
             });
 
+
             // Update x-axis categories
             chart.data.labels = newDataArray.map(function (item) {
                 return item.label;
@@ -717,6 +813,7 @@ function loadGrafikProdibytahun(prodi,tahun) {
         success: function (data) {
             console.log(prodi,tahun);
 
+            // Map the data into an array
             var newDataArray = data.map(function (item) {
                 return {
                     label: item.nama_sertifikasi,
@@ -769,6 +866,7 @@ function loadGrafikProdibytahun(prodi,tahun) {
                 borderColor: 'rgb(255, 205, 86)',
                 borderWidth: 1
             });
+
 
             // Update x-axis categories
             chart.data.labels = newDataArray.map(function (item) {

@@ -13,13 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id()->autoIncrement();;
-            $table->string('name');
-            $table->string('username');
-            $table->string('password');
-            $table->unsignedTinyInteger('status')->default(1); // Change 'unsignedTinyInteger' as per your requirements
-            $table->rememberToken();
+        Schema::create('prodi', function (Blueprint $table) {
+            $table->integer('id_prodi')->autoIncrement();
+            $table->string('nama_prodi',50);            
+            $table->string('status',50)->default('Aktif');
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('prodi');
     }
 };
