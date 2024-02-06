@@ -9,6 +9,18 @@
         </div>
     </div>
 
+    <div class="row mb-3">
+        <div class="col">
+            <select class="form-control btn-block" id="filter-year">
+                <option value="">Pilih Tahun</option>
+                @for ($i = 0; $i < 6; $i++) 
+                    <option value="{{ now()->year - $i }}">{{ now()->year - $i }}</option>
+                @endfor
+            </select>
+        </div>
+    </div>
+
+
     <div style="overflow-x: auto; width: 100%;">
         @if(session('success'))
             <script>
@@ -61,6 +73,10 @@
                                     <i class="fas fa-list" aria-hidden="true"></i>
                                 </a>
                                 
+                                <a href="{{ route('sertifikasi.edit', ['id' => $item->id_sertifikasi]) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
                                 <form id="deleteForm{{$item->id_sertifikasi}}" action="{{ route('sertifikasi.destroy', ['id' => $item->id_sertifikasi]) }}" method="POST" style="display: none;">
                                     @csrf
                                     @method('DELETE')
@@ -170,6 +186,33 @@
 
                     // Menampilkan modal
                     $('#modal-detail-' + idDetail).modal('show');
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            // Attach event listeners to the dropdowns
+            $('#filter-year').change(function () {
+                // Get the selected values
+                const selectedYear = $('#filter-year').val();
+
+                // Loop through each table row
+                $('#skemaTable tbody tr').each(function () {
+                    
+                    const rowDate = $(this).find('td:eq(3)').text();
+                    const rowYear = new Date(rowDate).getFullYear();
+
+                    // Log the values for debugging
+                    console.log("Row Year:", rowYear);
+
+                    // Check if the row matches the selected filters
+                    const yearMatch = selectedYear === "" || rowYear == selectedYear;
+
+                    // Log the matching results for debugging
+                    console.log("Year Match:", yearMatch);
+
+                    // Show or hide the row based on the filter results
+                    $(this).toggle(yearMatch);
                 });
             });
         });

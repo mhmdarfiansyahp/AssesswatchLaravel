@@ -1,7 +1,6 @@
 @extends('layoutsDashboard.layout')
 @section('konten')
 
-
 @if (session('error'))
     <script>
         Swal.fire({
@@ -228,9 +227,6 @@
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
 
 
-
-
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
@@ -302,11 +298,12 @@ $(document).ready(function () {
         var idProdi = document.getElementById('filter-prodi').value;
 
         // Call the function to load data based on the selected year
-        if (selectedYear === "" && idProdi === "") {
-            // Call the function to load data for all years
-            loadFilterSertifikasi(null, null);
-            loadGrafikkeseluruhan();
-        } else if(selectedYear === "" && idProdi !== ""){
+        // if (selectedYear === "" && idProdi === "") {
+        //     // Call the function to load data for all years
+        //     loadFilterSertifikasi(null, null);
+        //     loadGrafikkeseluruhan();
+        // } else 
+        if(selectedYear === "" && idProdi !== ""){
             // Call the function to load data based on the selected year
             loadGrafikByProdi(idProdi);
             loadFilterSertifikasi(null, null);
@@ -330,10 +327,11 @@ $(document).ready(function () {
         const idProdi = $(this).val();
         var years = document.getElementById('filter-year').value;
         // Call the function to load data based on the selected year
-        if(years === "" && idProdi === ""){
-            loadFilterSertifikasi(null, null);
-            loadGrafikkeseluruhan();
-        } else if(years === "" && idProdi !== ""){
+        // if(years === "" && idProdi === ""){
+        //     loadFilterSertifikasi(null, null);
+        //     loadGrafikkeseluruhan();
+        // } else 
+        if(years === "" && idProdi !== ""){
             loadGrafikByProdi(idProdi);
             loadFilterSertifikasi(null, null);
         }else if(years !== "" && idProdi === ""){

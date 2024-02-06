@@ -88,19 +88,20 @@ class prodiController extends Controller
     public function update(Request $request, $id)
     {
         $validateData = $request->validate([
-            'nama_prodi' => 'required|string|max:50',
+            'nama_prodi' => 'required|string|max:50|unique:prodi,nama_prodi,'.$id.',id_prodi',
             'status' => 'required|string|max:50', 
         ], [
             'nama_prodi.required' => 'Nama Program Studi Wajib Diisi.',
+            'nama_prodi.unique' => 'Nama Program Studi sudah ada.',
             'status.required' => 'Status wajib Diisi.',
         ]);
-
+    
         $data = Prodi::findOrFail($id);
-
+    
         $data->update($validateData);
-
+    
         return redirect()->route('prodi.index')->with('success', 'Program Studi Berhasil Diubah');
-
+    
     }
 
     /**

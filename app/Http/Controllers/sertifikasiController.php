@@ -44,7 +44,12 @@ class sertifikasiController extends Controller
         $validateData = $request->validate([
             'id_prodi' => 'required',
             'nama_sertifikasi' => 'required|string|max:50',
-            'tanggal_sertifikasi' => 'required',
+            'tanggal_sertifikasi' => ['required', 'date', function ($attribute, $value, $fail) {
+                $fiveYearsAgo = now()->subYears(4);
+                if ($value < $fiveYearsAgo->format('Y-m-d')) {
+                    $fail("Tanggal sertifikasi tidak boleh lebih dari 5 tahun yang lalu.");
+                }
+            }],
             'lembaga' => 'required',
             'level' => 'required',
             // 'levelKKNI' => 'required',
@@ -58,6 +63,7 @@ class sertifikasiController extends Controller
             'id_prodi.required' => 'Nama Prodi wajib diisi.',
             'nama_sertifikasi.required' => 'Nama Sertifikasi Wajib diisi.',
             'tanggal_sertifikasi.required' => 'Tanggal Wajib diisi.',
+            'tanggal_sertifikasi.date' => 'Format tanggal tidak valid.',
             'lembaga.required' => 'Lembaga Sertifikasi Wajib diisi.',            
             'level.required' => 'Level Sertifikasi Wajib diisi.',
             // 'levelKKNI.required' => 'Level KKNI Wajib diisi.',
@@ -101,10 +107,10 @@ class sertifikasiController extends Controller
      */
     public function edit($id)
     {
-        // $title ='Sertifikasi';
-        // $data = Sertifikasi::findOrFail($id);
-        // $prodis = Prodi::all();
-        // return view ('sertifikasi.edit',compact('title','prodis'),['sertifikasi' => $data]);
+        $title ='Sertifikasi';
+        $data = Sertifikasi::findOrFail($id);
+        $prodis = Prodi::all();
+        return view ('sertifikasi.edit',compact('title','prodis'),['sertifikasi' => $data]);
     }
 
     /**
@@ -143,7 +149,7 @@ class sertifikasiController extends Controller
 
         $data->delete();
 
-        return redirect()->route('sertifikasi.index')->with('success', 'Skema Deleted Successfully');
+        return redirect()->route('sertifikasi.index')->with('success', 'Sertifikasi Deleted Successfully');
     }
 
     public function download($id)

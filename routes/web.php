@@ -76,7 +76,6 @@ Route::middleware(['auth.pengguna'])->group(function () {
         Route::get('sertifikasi/detaildata/{year}',[sertifikasiController::class,'detaildata'])->name('sertifikasi.detaildata');
 
     });
-Route::get('/getNamaProdi/{id_sertifikasi}', [detailsertifikasiController::class,'getNamaProdi']);
 Route::get('sertifikasi/download/{id}', [sertifikasiController::class,'download'])->name('sertifikasi.download');
 Route::get('Dashboard/export/excel',[peopleController::class,'export_exel']);
 

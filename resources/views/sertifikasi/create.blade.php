@@ -23,21 +23,23 @@
                                     Pilih Prodi
                                     <span style="color: red;">*</span>
                                 </label>
-                        
+                            
                                 <select name="id_prodi" class="form-control @error('id_prodi') is-invalid @enderror" id="id_prodi">
                                     <option selected disabled> -- Pilih Program Studi --</option>
                                     @foreach ($prodis as $item)
-                                        <option value="{{ $item->id_prodi}}">{{$item->nama_prodi}}</option>
+                                        @if ($item->status == 'Aktif')
+                                            <option value="{{ $item->id_prodi}}">{{$item->nama_prodi}}</option>
+                                        @endif
                                     @endforeach
                                 </select>
                                 @error('id_prodi')
                                     <span class="text-danger">{{ $message }}</span><br>
                                 @enderror
-                            </div>
+                            </div>                            
                             <br>
                             <div class="col-12">
                                 <label for="nama_sertifikasi">
-                                    Nama sertifikasi
+                                    Nama Sertifikasi
                                     <span style="color: red;">*</span>
                                 </label>
                                 

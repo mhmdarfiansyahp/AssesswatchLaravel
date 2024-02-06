@@ -1,5 +1,7 @@
 @extends('layouts.layout')
 @section('konten')
+<title>Sertifikasi</title>
+
 
 {{-- <div class="row">
     <div class="col-md-3">
@@ -66,6 +68,7 @@
                         
                     </div>
                 </div>
+                <br>
                 <div class="col-12">
                     <div class="chart-container">
                         <canvas id="myChart" width="200" height="60"></canvas>
@@ -122,6 +125,45 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="modal fade" id="modal-detail">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                                <h5 class="modal-title">Detail Data Sertifikasi </h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+            
+                            <!-- Modal Body -->
+                            <div class="modal-body table-responsive">
+                                <table class="table table-bordered no-margin">
+                                    <tbody>
+            
+                                        <tr>
+                                            <th>Peserta Kompeten</th>
+                                            <td><span id="modal-detail-kom"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Peserta Tidak Kompeten</th>
+                                            <td><span id="modal-detail-tkom"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Peserta Tidak Hadir</th>
+                                            <td><span id="modal-detail-tdkh"></span></td>
+                                        </tr>                         
+                                        <tr>
+                                            <th>Total Peserta</th>
+                                            <td><span id="modal-detail-jmlh"></span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -170,7 +212,6 @@ $(document).ready(function() {
     $('[data-toggle="tooltip"]').tooltip();
 });
 
-loadGrafikkeseluruhan()
 $(document).ready(function () {
     // Attach event listeners to the dropdowns
     $('#filter-year, #filter-prodi, #filter-sertifikasi').change(function () {
