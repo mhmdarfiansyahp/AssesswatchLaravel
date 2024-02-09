@@ -4,8 +4,6 @@
 	<meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
 
-	{{-- <title><?php echo isset($title) ? $title . ' - ' . $this->config->item('title_app') : $this->config->item('title_app'); ?></title> --}}
-
     <link rel="shortcut icon" href="{{ asset('assets/image/Logo_ASTRAtech.png') }}">
     <link href="{{ asset('assets/Plugins/bootstrap-4.0.0-alpha.6-dist/css/bootstrap.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/Plugins/font-awesome-4.7.0/css/font-awesome.min.css') }}" rel="stylesheet" />
