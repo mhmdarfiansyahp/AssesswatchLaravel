@@ -1,5 +1,6 @@
 @extends('layouts.layout')
 @section('konten')
+<title>Pengguna</title>
 
 <section class="section">
     <div class="row">

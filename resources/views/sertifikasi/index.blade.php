@@ -1,5 +1,7 @@
 @extends('layouts.layout')
 @section('konten')
+<title>Sertifikasi</title>
+
 
     <div class="row mb-3">
         <div class="col-12">
@@ -13,7 +15,7 @@
         <div class="col">
             <select class="form-control btn-block" id="filter-year">
                 <option value="">Pilih Tahun</option>
-                @for ($i = 0; $i < 6; $i++) 
+                @for ($i = 0; $i < 5; $i++) 
                     <option value="{{ now()->year - $i }}">{{ now()->year - $i }}</option>
                 @endfor
             </select>
@@ -50,20 +52,25 @@
                     $nomor = 1; // Inisialisasi nomor
                 @endphp
                 @forelse ($sertifikasi as $item)
-                    @if ($item->prodi->status == 'Aktif')
-                        <tr>
+                    @if ($item->prodi->status == 'Aktif') <!-- Tambahkan pengecekan status prodi -->
+                        @if ($item->status == 'Tersedia')
+                            <tr>
+                        @else
+                            <tr class="table-danger"> <!-- Tambahkan kelas 'table-danger' jika status sertifikasi tidak aktif -->
+                        @endif
                             <td>{{$nomor++}}</td>
                             <td>{{$item->prodi->nama_prodi}}</td>
                             <td>{{$item['nama_sertifikasi']}}</td>
                             <td>{{ \Carbon\Carbon::parse($item->tanggal_sertifikasi)->format('d-F-Y') }}</td>
                             <td>{{$item['lembaga']}}</td>
                             <td>{{$item['level']}}</td>
-                            <td><a href="{{ route('sertifikasi.download', ['id' => $item->id_sertifikasi]) }}" class="btn btn-primary btn-download" download>
-                                    <i class="fa fa-download"></i> &nbsp;Download Bukti Pendukung
+                            <td>
+                                <a href="{{ route('sertifikasi.showPdf', ['id' => $item->id_sertifikasi]) }}" class="btn btn-primary btn-download" target="_blank">
+                                    <i class="fa fa-eye"></i> &nbsp;Lihat Bukti Pendukung
                                 </a>
                             </td>
+                                                        
                             <td>
-
                                 <a href="" id="detail-{{ $item->id_detail_sertifikasi }}" class="btn btn-sm detail-button"
                                     data-toggle="modal" data-target="#modal-detail"
                                     data-kom="{{ $item->kompeten }}"
@@ -76,16 +83,15 @@
                                 <a href="{{ route('sertifikasi.edit', ['id' => $item->id_sertifikasi]) }}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
-
+            
                                 <form id="deleteForm{{$item->id_sertifikasi}}" action="{{ route('sertifikasi.destroy', ['id' => $item->id_sertifikasi]) }}" method="POST" style="display: none;">
                                     @csrf
                                     @method('DELETE')
                                 </form>
                                 
-                                <button class="btn btn-sm btn-danger delete-button" data-id="{{$item->id_sertifikasi}}">
+                                <button class="btn btn-sm btn-danger delete-button" data-id="{{$item->id_sertifikasi}}" data-status="{{$item->status}}">
                                     <i class="fas fa-trash"></i>
                                 </button>
-                                
                             </td>
                         </tr>
                     @endif
@@ -94,8 +100,7 @@
                         <td colspan="13" class="text-center">Tidak ada data sertifikasi yang tersedia.</td>
                     </tr>
                 @endforelse
-                
-            </tbody>
+            </tbody>            
         </table>
     </div>
 
@@ -131,7 +136,6 @@
                                 <th>Total Peserta</th>
                                 <td><span id="modal-detail-jmlh"></span></td>
                             </tr>
-                        
 
                         </tbody>
                     </table>
@@ -147,22 +151,34 @@
             document.querySelectorAll('.delete-button').forEach(button => {
                 button.addEventListener('click', function () {
                     const skemaId = this.getAttribute('data-id');
-                    Swal.fire({
-                        title: 'Konfirmasi Hapus',
-                        text: 'Apakah Anda yakin ingin menghapus skema ini?',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Hapus',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Menampilkan formulir sebelum mengirimkan permintaan DELETE
-                            const deleteForm = document.getElementById('deleteForm' + skemaId);
-                            deleteForm.submit();
-                        }
-                    });
+                    const status = this.getAttribute('data-status');
+
+                    if (status === 'Tidak Tersedia') {
+                        Swal.fire({
+                            title: 'Gagal Menghapus',
+                            text: 'Status Sertifikasi sudah Tidak tersedia.',
+                            icon: 'error',
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'OK'
+                        });
+                    }else{
+                        Swal.fire({
+                            title: 'Konfirmasi Hapus',
+                            text: 'Apakah Anda yakin ingin menghapus Sertifikasi ini?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: 'Hapus',
+                            cancelButtonText: 'Batal',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Menampilkan formulir sebelum mengirimkan permintaan DELETE
+                                const deleteForm = document.getElementById('deleteForm' + skemaId);
+                                deleteForm.submit();
+                            }
+                        });
+                    }
                 });
             });
         });
@@ -185,7 +201,7 @@
                     document.getElementById('modal-detail-jmlh').innerText = jumlah;
 
                     // Menampilkan modal
-                    $('#modal-detail-' + idDetail).modal('show');
+                    $('#modal-detail-').modal('show');
                 });
             });
         });

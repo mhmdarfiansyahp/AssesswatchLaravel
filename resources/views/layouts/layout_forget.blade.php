@@ -59,10 +59,10 @@
         </div>
     @endif
 
-    <form action="{{ route('login.action')}}" method="POST">
+    <form action="{{ route('reset.password')}}" method="POST">
         @csrf
         <div class="polman-form-login">
-            <h4>Please Login</h4>
+            <h4>Lupa Password</h4>
             <hr />
     
             <div class="form-group">
@@ -75,21 +75,18 @@
     
             <div class="form-group">
                 <label for="Password">
-                    Password
+                    New Password
                     <span style="color: red;">*</span>
                 </label>
                 <input id="Password" type="Password" name="Password" class="form-control">
             </div>
     
-            <a href="{{ route('dashboard1.index') }}" class="btn btn-secondary mb-1">Kembali</a>
-            <button type="submit" id="btnLogin" class="btn btn-primary">Masuk</button>
-            <p  class="mt-3 mb-0">Lupa Password?<a href="{{ route('forget.index') }}"> Klik disini</a></p>
+            <button type="submit" id="btnLogin" class="btn btn-primary">Simpan</button>
+
         </div> 
-            
     </form>
     
     <div class="mb-5"></div>
-    
 
 	<div class="mt-5" style="background-color: white; width: 100%; position: fixed; left: 0; bottom: 0;">
         <div class="container-fluid">

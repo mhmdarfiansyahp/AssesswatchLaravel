@@ -4,6 +4,7 @@ use App\Http\Controllers\Dashboard1Controller;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\detailsertiController;
 use App\Http\Controllers\detailsertifikasiController;
+use App\Http\Controllers\ForgetController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\people;
 use App\Http\Controllers\peopleController;
@@ -35,18 +36,18 @@ Route::get('login',[SessionController::class,'index'])->name('login.index');
 Route::post('login/action',[SessionController::class,'login'])->name('login.action');
 Route::get('logout',[SessionController::class,'logout'])->name('login.logout');
 
+Route::get('forget',[ForgetController::class,'index'])->name('forget.index');
+Route::post('forget/reset-password', [ForgetController::class, 'resetPassword'])->name('reset.password');
+
+
 Route::middleware(['auth.pengguna'])->group(function () {
     // Routes yang perlu dilindungi
-    Route::get('Dashboard', [DashboardController::class,'index'])->name('Dashboard.index');
-    
+    Route::get('Dashboard', [DashboardController::class,'index'])->name('Dashboard.index');    
 });
 
 
 //Routes login
-
-    Route::get('index', [DashboardController::class,'index'])->name('Dashboard.index');
-
-        //Filter data
+    //Filter data
     Route::get('Dashboard/detaildata/{year}',[DashboardController::class,'detaildata'])->name('Dashboard.detaildata');
     Route::get('Dashboard/alldata',[DashboardController::class,'alldata'])->name('Dashboard.alldata');
     Route::get('Dashboard/sertifilter/{serti}',[DashboardController::class,'sertifilter'])->name('Dashboard.sertifilter');
@@ -76,13 +77,17 @@ Route::middleware(['auth.pengguna'])->group(function () {
         Route::get('sertifikasi/detaildata/{year}',[sertifikasiController::class,'detaildata'])->name('sertifikasi.detaildata');
 
     });
-Route::get('sertifikasi/download/{id}', [sertifikasiController::class,'download'])->name('sertifikasi.download');
-Route::get('Dashboard/export/excel',[peopleController::class,'export_exel']);
+// Route::get('sertifikasi/download/{id}', [sertifikasiController::class,'download'])->name('sertifikasi.download');
+Route::get('sertifikasi/showPdf/{id}', [sertifikasiController::class,'showPdf'])->name('sertifikasi.showPdf');
 
-Route::get('pengguna',[PenggunaController::class,'index'])->name('pengguna.index');
-Route::get('pengguna/create',[PenggunaController::class,'create'])->name('pengguna.create');
-Route::post('pengguna',[PenggunaController::class,'store'])->name('pengguna.store');
-Route::get('pengguna/{id}/edit',[PenggunaController::class,'edit'])->name('pengguna.edit');
-Route::put('pengguna/{id}',[PenggunaController::class,'update'])->name('pengguna.update');
-Route::delete('pengguna/delete/{id}', [PenggunaController::class, 'destroy'])->name('pengguna.destroy');
+// Route::get('Dashboard/export/excel',[peopleController::class,'export_exel']);
+Route::middleware(['auth.pengguna'])->group(function () {
 
+    Route::get('pengguna',[PenggunaController::class,'index'])->name('pengguna.index');
+    Route::get('pengguna/create',[PenggunaController::class,'create'])->name('pengguna.create');
+    Route::post('pengguna',[PenggunaController::class,'store'])->name('pengguna.store');
+    Route::get('pengguna/{id}/edit',[PenggunaController::class,'edit'])->name('pengguna.edit');
+    Route::put('pengguna/{id}',[PenggunaController::class,'update'])->name('pengguna.update');
+    Route::delete('pengguna/delete/{id}', [PenggunaController::class, 'destroy'])->name('pengguna.destroy');
+
+});

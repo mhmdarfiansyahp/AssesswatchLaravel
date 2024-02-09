@@ -1,5 +1,6 @@
 @extends('layouts.layout')
 @section('konten')
+<title>Program Studi</title>
 
 <section class="section">
     <div class="row">

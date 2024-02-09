@@ -26,6 +26,7 @@ return new class extends Migration
             $table->integer('tidakkompeten');
             $table->integer('tidakhadir');
             $table->integer('jumlah');
+            $table->string('status',50)->default('Aktif');
             // $table->date('tanggal_sertifikasi');
 
              // Replace 'nama_tabel_prodi' with the actual table name

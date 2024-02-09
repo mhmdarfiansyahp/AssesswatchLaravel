@@ -22,7 +22,7 @@ class Sertifikasi extends Model
 
     public $incrementing = true;
 
-    protected $fillable = ['id_sertifikasi','id_prodi','nama_sertifikasi','tanggal_sertifikasi','lembaga','level','buktipendukung','kompeten','tidakkompeten','tidakhadir','jumlah'];
+    protected $fillable = ['id_sertifikasi','id_prodi','nama_sertifikasi','tanggal_sertifikasi','lembaga','level','buktipendukung','kompeten','tidakkompeten','tidakhadir','jumlah','status'];
     
     public function getNamaProdi($id_sertifikasi)
     {

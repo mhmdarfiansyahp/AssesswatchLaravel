@@ -58,21 +58,6 @@
 </style>
 
 <div class="container-fluid">
-    {{-- <div class="card-logo">
-        <img class="card-img-top" src="{{ asset('assets/image/gambar_banner.jpg') }}" alt="Banner Image">
-    
-        <div class="row">
-            <div class="col-lg-4" style="text-align: center; padding: 40px 0px;">
-                <img src="{{ asset('assets/image/IMG_LogoTransformationInHarmony.png') }}" class="wow fadeInUp fast" style="width: 60%; visibility: visible; animation-name: fadeInUp; animation-iteration-count: 1;">
-            </div>
-            <div class="col-lg-4" style="text-align: center; padding: 40px 0px;">
-                <img src="{{ asset('assets/image/IMG_LogoKampusMerdeka.png') }}" class="wow fadeInUp fast" style="width: 30%; visibility: visible; animation-name: fadeInUp; animation-iteration-count: 1;">
-            </div>
-            <div class="col-lg-4" style="text-align: center; padding: 40px 0px;">
-                <img src="{{ asset('assets/image/IMG_LogoSatuIndonesia.png') }}" class="wow fadeInUp fast" style="width: 40%; visibility: visible; animation-name: fadeInUp; animation-iteration-count: 1;">
-            </div>
-        </div>
-    </div> --}}
 
     <div class="row">
         <div class="col-md-12">
@@ -118,6 +103,7 @@
                             
                         </div>
                     </div>
+                    <br>
                     <div class="col-12">
                         <div class="chart-container">
                             <canvas id="myChart" width="180" height="50"></canvas>
@@ -140,11 +126,21 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr>
+                                    <td colspan="8">
+                                        <div class="alert alert-info" role="alert">
+                                            Warna merah pada tabel menunjukkan bahwa Sertifikasi tersebut sudah lewat dari 5 tahun.
+                                        </div>
+                                    </td>
+                                </tr>
                                 @php
                                     $nomor = 1; // Inisialisasi nomor
                                 @endphp
                                 @forelse ($sertifikasi->where('prodi.status', 'Aktif')->sortBy('tanggal_sertifikasi') as $item)
-                                <tr data-prodi-id="{{ $item->prodi->id_prodi }}" data-sertifikasi-id="{{ $item->id_sertifikasi }}">
+                                @php
+                                    $rowClass = ($item->status != 'Tersedia') ? 'table-danger' : ''; // menentukan kelas CSS berdasarkan status sertifikasi
+                                @endphp
+                                <tr class="{{ $rowClass }}" data-prodi-id="{{ $item->prodi->id_prodi }}" data-sertifikasi-id="{{ $item->id_sertifikasi }}">
                                     <td class="align-middle text-center">{{$nomor++}}</td>
                                     <td class="align-middle text-center">{{$item->prodi->nama_prodi}}</td>
                                     <td class="align-middle text-center">{{$item['nama_sertifikasi']}}</td>
@@ -152,10 +148,10 @@
                                     <td class="align-middle text-center">{{$item['lembaga']}}</td>
                                     <td class="align-middle text-center">{{$item['level']}}</td>
                                     <td class="align-middle text-center">
-                                        <a href="{{ route('sertifikasi.download', ['id' => $item->id_sertifikasi]) }}" class="btn btn-primary btn-download" download>
-                                            <i class="fa fa-download"></i> &nbsp;Download Bukti Pendukung
+                                        <a href="{{ route('sertifikasi.showPdf', ['id' => $item->id_sertifikasi]) }}" class="btn btn-primary btn-download" target="_blank">
+                                            <i class="fa fa-eye"></i> &nbsp;Lihat Bukti Pendukung
                                         </a>
-                                    </td> 
+                                    </td>
                                     <td class="align-middle text-center">
                                         <a href="" id="detail-{{ $item->id_detail_sertifikasi }}" class="btn btn-sm detail-button"
                                             data-toggle="modal" data-target="#modal-detail"
@@ -254,7 +250,6 @@
 
 <script>
 
-loadGrafikkeseluruhan()
 $(document).ready(function () {
     // Attach event listeners to the dropdowns
     $('#filter-year, #filter-prodi, #filter-sertifikasi').change(function () {
@@ -298,27 +293,34 @@ $(document).ready(function () {
         var idProdi = document.getElementById('filter-prodi').value;
 
         // Call the function to load data based on the selected year
-        // if (selectedYear === "" && idProdi === "") {
-        //     // Call the function to load data for all years
-        //     loadFilterSertifikasi(null, null);
-        //     loadGrafikkeseluruhan();
-        // } else 
-        if(selectedYear === "" && idProdi !== ""){
-            // Call the function to load data based on the selected year
-            loadGrafikByProdi(idProdi);
-            loadFilterSertifikasi(null, null);
-        } else if (selectedYear !== "" && idProdi === ""){
-            loadGrafikBytahun(selectedYear);
-            loadFilterSertifikasi(null, null);
-        } else if(selectedYear !== "" && idProdi !== ""){
-            loadFilterSertifikasi(idProdi,selectedYear);
-            loadGrafikProdibytahun(idProdi,selectedYear);
-        }else {
-            loadFilterSertifikasi(null, null);
-            loadGrafikBytahun(selectedYear);
+        // Check if both filters are empty
+        if(selectedYear === "" && idProdi === ""){
+            // Hide the chart container if both filters are empty
+            $('#chart-container').hide();
+            // Clear the chart data if both filters are empty
+            clearChartData();
+        } else {
+            // Show the chart container if at least one filter is selected
+            $('#chart-container').show();
+
+            if(selectedYear === "" && idProdi !== ""){
+                // Call the function to load data based on the selected year
+                loadGrafikByProdi(idProdi);
+                loadFilterSertifikasi(null, null);
+            } else if (selectedYear !== "" && idProdi === ""){
+                loadGrafikBytahun(selectedYear);
+                loadFilterSertifikasi(null, null);
+            } else if(selectedYear !== "" && idProdi !== ""){
+                loadFilterSertifikasi(idProdi,selectedYear);
+                loadGrafikProdibytahun(idProdi,selectedYear);
+            }else {
+                loadFilterSertifikasi(null, null);
+                loadGrafikBytahun(selectedYear);
+            }
         }
     });
 });
+
 
 $(document).ready(function () {
     // Attach an event listener to the dropdown
@@ -327,26 +329,40 @@ $(document).ready(function () {
         const idProdi = $(this).val();
         var years = document.getElementById('filter-year').value;
         // Call the function to load data based on the selected year
-        // if(years === "" && idProdi === ""){
-        //     loadFilterSertifikasi(null, null);
-        //     loadGrafikkeseluruhan();
-        // } else 
-        if(years === "" && idProdi !== ""){
-            loadGrafikByProdi(idProdi);
-            loadFilterSertifikasi(null, null);
-        }else if(years !== "" && idProdi === ""){
-            loadGrafikBytahun(years);
-            loadFilterSertifikasi(null, null);
-        } else if(years !== "" && idProdi !== ""){
-            loadFilterSertifikasi(idProdi,years);
-            loadGrafikProdibytahun(idProdi,years);
-        }else {
-            loadFilterSertifikasi(null, null);
-            loadGrafikByProdi(idProdi);
+        // Check if both filters are empty
+        if(years === "" && idProdi === ""){
+            // Hide the chart container if both filters are empty
+            $('#chart-container').hide();
+            // Clear the chart data if both filters are empty
+            clearChartData();
+        } else {
+            // Show the chart container if at least one filter is selected
+            $('#chart-container').show();
+
+            if(years === "" && idProdi !== ""){
+                loadGrafikByProdi(idProdi);
+                loadFilterSertifikasi(null, null);
+            }else if(years !== "" && idProdi === ""){
+                loadGrafikBytahun(years);
+                loadFilterSertifikasi(null, null);
+            } else if(years !== "" && idProdi !== ""){
+                loadFilterSertifikasi(idProdi,years);
+                loadGrafikProdibytahun(idProdi,years);
+            }else {
+                loadFilterSertifikasi(null, null);
+                loadGrafikByProdi(idProdi);
+            }
         }
         
     });
 });
+
+// Function to clear chart data
+function clearChartData() {
+    chart.data.labels = [];
+    chart.data.datasets = [];
+    chart.update();
+}
 
 $(document).ready(function () {
     // Attach an event listener to the dropdown

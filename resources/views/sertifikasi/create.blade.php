@@ -1,5 +1,7 @@
 @extends('layouts.layout')
 @section('konten')
+<title>Sertifikasi</title>
+
     {{-- @if ($errors->any())
     <div class="alert alert-danger">
         <ul>

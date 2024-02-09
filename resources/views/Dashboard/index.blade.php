@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('konten')
-<title>Sertifikasi</title>
+<title>Dashboard</title>
 
 
 {{-- <div class="row">
@@ -94,35 +94,39 @@
                             @php
                                 $nomor = 1; // Inisialisasi nomor
                             @endphp
-                                @forelse ($sertifikasi->where('prodi.status', 'Aktif')->sortBy('tanggal_sertifikasi') as $item)
-                                    <tr data-prodi-id="{{ $item->prodi->id_prodi }}" data-sertifikasi-id="{{ $item->id_sertifikasi }}">
-                                            <td>{{$nomor++}}</td>
-                                            <td>{{$item->prodi->nama_prodi}}</td>
-                                            <td>{{$item['nama_sertifikasi']}}</td>
-                                            <td>{{ \Carbon\Carbon::parse($item->tanggal_sertifikasi)->format('d-F-Y') }}</td>
-                                            <td>{{$item['lembaga']}}</td>
-                                            <td>{{$item['level']}}</td>
-                                            <td><a href="{{ route('sertifikasi.download', ['id' => $item->id_sertifikasi]) }}" class="btn btn-primary btn-download" download>
-                                                    <i class="fa fa-download"></i> &nbsp;Download Bukti Pendukung
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="" id="detail-{{ $item->id_detail_sertifikasi }}" class="btn btn-sm detail-button"
-                                                    data-toggle="modal" data-target="#modal-detail"
-                                                    data-kom="{{ $item->kompeten }}"
-                                                    data-tkom="{{ $item->tidakkompeten }}"
-                                                    data-tdkh="{{ $item->tidakhadir }}"
-                                                    data-jmlh="{{ $item->jumlah }}">
-                                                    <i class="fas fa-list" aria-hidden="true"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="13" class="text-center">Tidak ada data sertifikasi yang tersedia.</td>
-                                    </tr>
+                            @forelse ($sertifikasi->where('prodi.status', 'Aktif')->sortBy('tanggal_sertifikasi') as $item)
+                                @php
+                                    $rowClass = ($item->status != 'Tersedia') ? 'table-danger' : ''; // menentukan kelas CSS berdasarkan status sertifikasi
+                                @endphp
+                                <tr class="{{ $rowClass }}" data-prodi-id="{{ $item->prodi->id_prodi }}" data-sertifikasi-id="{{ $item->id_sertifikasi }}">
+                                    <td>{{$nomor++}}</td>
+                                    <td>{{$item->prodi->nama_prodi}}</td>
+                                    <td>{{$item['nama_sertifikasi']}}</td>
+                                    <td>{{ \Carbon\Carbon::parse($item->tanggal_sertifikasi)->format('d-F-Y') }}</td>
+                                    <td>{{$item['lembaga']}}</td>
+                                    <td>{{$item['level']}}</td>
+                                    <td>
+                                        <a href="{{ route('sertifikasi.showPdf', ['id' => $item->id_sertifikasi]) }}" class="btn btn-primary btn-download" target="_blank">
+                                            <i class="fa fa-eye"></i> &nbsp;Lihat Bukti Pendukung
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="" id="detail-{{ $item->id_detail_sertifikasi }}" class="btn btn-sm detail-button"
+                                            data-toggle="modal" data-target="#modal-detail"
+                                            data-kom="{{ $item->kompeten }}"
+                                            data-tkom="{{ $item->tidakkompeten }}"
+                                            data-tdkh="{{ $item->tidakhadir }}"
+                                            data-jmlh="{{ $item->jumlah }}">
+                                            <i class="fas fa-list" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="13" class="text-center">Tidak ada data sertifikasi yang tersedia.</td>
+                                </tr>
                             @endforelse
-                        </tbody>
+                        </tbody>                        
                     </table>
                 </div>
 
@@ -255,26 +259,34 @@ $(document).ready(function () {
         var idProdi = document.getElementById('filter-prodi').value;
 
         // Call the function to load data based on the selected year
-        if (selectedYear === "" && idProdi === "") {
-            // Call the function to load data for all years
-            loadFilterSertifikasi(null, null);
-            loadGrafikkeseluruhan();
-        } else if(selectedYear === "" && idProdi !== ""){
-            // Call the function to load data based on the selected year
-            loadGrafikByProdi(idProdi);
-            loadFilterSertifikasi(null, null);
-        } else if (selectedYear !== "" && idProdi === ""){
-            loadGrafikBytahun(selectedYear);
-            loadFilterSertifikasi(null, null);
-        } else if(selectedYear !== "" && idProdi !== ""){
-            loadFilterSertifikasi(idProdi,selectedYear);
-            loadGrafikProdibytahun(idProdi,selectedYear);
-        }else {
-            loadFilterSertifikasi(null, null);
-            loadGrafikBytahun(selectedYear);
+        // Check if both filters are empty
+        if(selectedYear === "" && idProdi === ""){
+            // Hide the chart container if both filters are empty
+            $('#chart-container').hide();
+            // Clear the chart data if both filters are empty
+            clearChartData();
+        } else {
+            // Show the chart container if at least one filter is selected
+            $('#chart-container').show();
+
+            if(selectedYear === "" && idProdi !== ""){
+                // Call the function to load data based on the selected year
+                loadGrafikByProdi(idProdi);
+                loadFilterSertifikasi(null, null);
+            } else if (selectedYear !== "" && idProdi === ""){
+                loadGrafikBytahun(selectedYear);
+                loadFilterSertifikasi(null, null);
+            } else if(selectedYear !== "" && idProdi !== ""){
+                loadFilterSertifikasi(idProdi,selectedYear);
+                loadGrafikProdibytahun(idProdi,selectedYear);
+            }else {
+                loadFilterSertifikasi(null, null);
+                loadGrafikBytahun(selectedYear);
+            }
         }
     });
 });
+
 
 $(document).ready(function () {
     // Attach an event listener to the dropdown
@@ -283,25 +295,40 @@ $(document).ready(function () {
         const idProdi = $(this).val();
         var years = document.getElementById('filter-year').value;
         // Call the function to load data based on the selected year
+        // Check if both filters are empty
         if(years === "" && idProdi === ""){
-            loadFilterSertifikasi(null, null);
-            loadGrafikkeseluruhan();
-        } else if(years === "" && idProdi !== ""){
-            loadGrafikByProdi(idProdi);
-            loadFilterSertifikasi(null, null);
-        }else if(years !== "" && idProdi === ""){
-            loadGrafikBytahun(years);
-            loadFilterSertifikasi(null, null);
-        } else if(years !== "" && idProdi !== ""){
-            loadFilterSertifikasi(idProdi,years);
-            loadGrafikProdibytahun(idProdi,years);
-        }else {
-            loadFilterSertifikasi(null, null);
-            loadGrafikByProdi(idProdi);
+            // Hide the chart container if both filters are empty
+            $('#chart-container').hide();
+            // Clear the chart data if both filters are empty
+            clearChartData();
+        } else {
+            // Show the chart container if at least one filter is selected
+            $('#chart-container').show();
+
+            if(years === "" && idProdi !== ""){
+                loadGrafikByProdi(idProdi);
+                loadFilterSertifikasi(null, null);
+            }else if(years !== "" && idProdi === ""){
+                loadGrafikBytahun(years);
+                loadFilterSertifikasi(null, null);
+            } else if(years !== "" && idProdi !== ""){
+                loadFilterSertifikasi(idProdi,years);
+                loadGrafikProdibytahun(idProdi,years);
+            }else {
+                loadFilterSertifikasi(null, null);
+                loadGrafikByProdi(idProdi);
+            }
         }
         
     });
 });
+
+// Function to clear chart data
+function clearChartData() {
+    chart.data.labels = [];
+    chart.data.datasets = [];
+    chart.update();
+}
 
 $(document).ready(function () {
     // Attach an event listener to the dropdown
@@ -475,80 +502,7 @@ function loadGrafikBytahun(selectedYear) {
 
 }
 
-function loadGrafikkeseluruhan() {
-    $.ajax({
-        url: "/Dashboard/alldata",
-        type: "GET",
-        dataType: 'json',
-        success: function (data) {
-            // Map the data into an array
-            var newDataArray = data.map(function (item) {
-            return {
-                label: item.nama_prodi,
-                kompeten: item.total_kompeten,
-                tidakKompeten: item.total_tidakkompeten,
-                tidakHadir: item.total_tidakhadir,
-            };
-        });
-            
-            // Separate arrays for each dataset
-            var kompetenData = newDataArray.map(function (item) {
-                return item.kompeten;
-            });
 
-            var tidakKompetenData = newDataArray.map(function (item) {
-                return item.tidakKompeten;
-            });
-
-            var tidakHadirData = newDataArray.map(function (item) {
-                return item.tidakHadir;
-            });
-
-            // Clear existing datasets
-            chart.data.datasets = [];
-
-            // Add bar datasets
-            chart.data.datasets.push({
-                label: 'Kompeten (Bar)',
-                type: 'bar',
-                data: kompetenData,
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgb(54, 162, 235)',
-                borderWidth: 1
-            });
-
-            chart.data.datasets.push({
-                label: 'TidakKompeten',
-                type: 'bar',
-                data: tidakKompetenData,
-                backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                borderColor: 'rgb(255, 159, 64)',
-                borderWidth: 1
-            });
-
-            chart.data.datasets.push({
-                label: 'TidakHadir',
-                type: 'bar',
-                data: tidakHadirData,
-                backgroundColor: 'rgba(255, 205, 86, 0.2)',
-                borderColor: 'rgb(255, 205, 86)',
-                borderWidth: 1
-            });
-
-            // Update x-axis categories
-            chart.data.labels = newDataArray.map(function (item) {
-                return item.label;
-            });
-
-            // Update the chart
-            chart.update();
-        },
-        error: function (xhr, status, error) {
-            console.error("AJAX Error:", status, error);
-            swal.fire("Error!", "Terjadi kesalahan saat mengambil data pemakaian!", "error");
-        }
-    });
-}
 
 function loadGrafikByProdi(sertifikasi) {
     $.ajax({

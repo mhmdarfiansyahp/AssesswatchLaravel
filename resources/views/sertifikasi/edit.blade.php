@@ -12,6 +12,7 @@
                     <div class="card-body">
                         <h5 class="card-header">Ubah Sertifikasi</h5>
                         <br>
+                        @method('PUT')
                         <div class="col-12">
                             <label for="id_prodi">
                                 Pilih Prodi
@@ -124,6 +125,21 @@
                             <label for="jumlah">Total Peserta <span style="color: red;">*</span></label>
                             <input type="number" name="jumlah" class="form-control" id="jumlah" value="{{ old('jumlah', $sertifikasi->jumlah) }}" readonly>
                             <!-- readonly agar nilai tidak dapat diubah manual oleh pengguna -->
+                        </div>
+                        <br>
+                        <div class="col-12">
+                            <label for="status">
+                                Pilih Status
+                                <span style="color: red;">*</span>
+                            </label>
+                            <select name="status" class="form-control" id="status">
+                                <option value="" selected disabled>-- Pilih Status Sertifikasi --</option>
+                                <option value="Aktif" {{ old('status', $sertifikasi->status) == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                                <option value="Tidak Aktif" {{ old('status', $sertifikasi->status) == 'Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                            </select>                                
+                            @error('status')
+                                <span class="text-danger">{{ $message }}</span><br>
+                            @enderror
                         </div>
                     </div>
                     <br>

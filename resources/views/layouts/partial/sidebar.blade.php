@@ -12,10 +12,10 @@
                 @php
                     $logged_in = session('logged_in'); 
                 @endphp
-                <a class="d-block"><b>Hai,</b>&nbsp;{{$logged_in->nama}}</a>
+                <a class="d-block">Hai,&nbsp;<strong>{{$logged_in->nama}}</strong></a>
             @endif
         </div>
-    </div>
+    </div>    
 
     <div class="polman-menu-bar">
         <div class="float-right">
