@@ -99,7 +99,7 @@
                                     $rowClass = ($item->status != 'Tersedia') ? 'table-danger' : ''; // menentukan kelas CSS berdasarkan status sertifikasi
                                 @endphp
                                 <tr class="{{ $rowClass }}" data-prodi-id="{{ $item->prodi->id_prodi }}" data-sertifikasi-id="{{ $item->id_sertifikasi }}">
-                                    <td>{{$nomor++}}</td>
+                                    <td>{{$nomor++}} </td>
                                     <td>{{$item->prodi->nama_prodi}}</td>
                                     <td>{{$item['nama_sertifikasi']}}</td>
                                     <td>{{ \Carbon\Carbon::parse($item->tanggal_sertifikasi)->format('d-F-Y') }}</td>
